@@ -4,7 +4,7 @@
 * ✅ level_download
 * ✅ account_comment_get
 * ✅ get_user_info
-* ✅ get_challenges
+* ❌ get_challenges
 * ✅ comment_get_history
 * ✅ comments_get
 * ❌ friend_accept_request
