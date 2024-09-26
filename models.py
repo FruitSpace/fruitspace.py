@@ -31,7 +31,7 @@ class Technical:
 
 @dataclass
 class Social:
-    blacklist_ids: Any
+    blacklist_ids: Any # needs testing
     friends_count: int
     friendship_ids: Any
 
