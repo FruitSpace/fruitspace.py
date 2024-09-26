@@ -1,14 +1,11 @@
 import json
-from typing import Any
 
 import requests
 
-import enums
 import urls
 from enums import TopType
 from models import User, Comment, Level
 from urls import GD
-from utils import gjp, gjp2
 
 _base_url: str = 'https://rugd.gofruit.space/{gdps}' # %s is GDPS index
 
@@ -199,7 +196,7 @@ class GhostClient:
         return ret
 
 
-    def get_level_comments(self, levelID: int, page: int = 0, mode: int = 0, total: int = 10):
+    def get_level_comments(self, levelID: int, page: int = 0, mode: int = 0, total: int = 10) -> list[Comment]:
         data = {
             'levelID': levelID,
             'page': page,
