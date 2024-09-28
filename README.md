@@ -7,16 +7,16 @@
 * ❌ get_challenges
 * ✅ comment_get_history
 * ✅ comments_get
-* ❌ friend_accept_request
-* ❌ friend_reject_request
-* ❌ friend_get_requests
-* ❌ friend_read_request
-* ❌ friend_remove
-* ❌ friend_request
-* ❌ block_user
+* ✅ friend_accept_request
+* ✅ friend_reject_request
+* ✅ friend_get_requests
+* ✅ friend_read_request
+* ✅ friend_remove
+* ✅ send_friend_request
+* ✅ block_user
 * ❌ account_backup
 * ❌ account_management
-* ❌ account_register
+* ✅ account_register
 * ❌ account_sync
 * ❌ account_backup_new
 * ❌ account_sync_new
@@ -25,11 +25,11 @@
 * ❌ level_delete
 * ❌ message_delete
 * ❌ message_get
-* ❌ get_account
+* ❌ get_account (зачем)
 * ✅ get_creators
 * ✅ level_get_daily (returns int)
 * ❌ get_gauntlets
-* ❌ get_level_scores
+* ✅ get_level_scores (почему-то выдаёт -2. всегда. абсолютно.)
 * ❌ get_map_packs
 * ❌ message_get_all
 * ❌ get_rewards
@@ -43,7 +43,7 @@
 * ❌ level_report
 * ❌ request_mod
 * ❌ suggest_stars
-* ❌ unblock_user
+* ✅ unblock_user
 * ❌ update_account_settings
 * ❌ level_update_description
 * ❌ update_user_score

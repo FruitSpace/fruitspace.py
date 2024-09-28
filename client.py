@@ -1,11 +1,13 @@
 import json
+from typing import Any
 
 import requests
 
 import urls
 from enums import TopType
-from models import User, Comment, Level
+from models import User, Comment, Level, FriendRequest
 from urls import GD
+from utils import gjp2, gjp, base64
 
 _base_url: str = 'https://rugd.gofruit.space/{gdps}' # %s is GDPS index
 
@@ -24,64 +26,64 @@ def _send(gdps_id: str, url: urls.GD | str, data: dict, use_json: bool = True) -
     return __send(gdps_id, url.value if type(url)==GD else url, data, use_json)
 
 class GhostClient:
-    # username: str = None
-    # password: str = None
-    # user_id: int = None
+    username: str = None
+    password: str = None
+    user_id: int = None
 
 
     def __init__(self, gdps_id: str, username: str = None, password: str = None):
         self.gdps_id = gdps_id
-        # if username and password:
-        #     self.username = username
-        #     self.password = password
-        #     user_id = self._login()
-        #     if user_id < 0:
-        #         raise Exception(f'Incorrect username or password. Error code: {user_id}')
-        #     else:
-        #         self.user_id = user_id
+        if username and password:
+            self.username = username
+            self.password = password
+            user_id = self._login()
+            if user_id < 0:
+                raise Exception(f'Incorrect username or password. Error code: {user_id}')
+            else:
+                self.user_id = user_id
 
 
-    # def _use_session(self, data: dict[str, Any]):
-    #     if self.user_id:
-    #         data['accountID'] = self.user_id
-    #         data['gjp'] = gjp(self.password)
-    #         data['gjp2'] = gjp2(self.password)
+    def _use_session(self, data: dict[str, Any]):
+        if self.user_id:
+            data['accountID'] = self.user_id
+            data['gjp'] = gjp(self.password)
+            data['gjp2'] = gjp2(self.password)
 
     
     def _login(self) -> int:
-        # noinspection PyTypeChecker
-        resp = _send(self.gdps_id, GD.account_login, {'username': self.username, 'password': self.password},
-                         use_json=True)
-        return int(resp['code'])
+        r = _send(self.gdps_id, GD.account_login, {'userName': self.username, 'password': self.password})
 
+        if 'code' in r and  r['code'] == '-1':
+            self._register()
+            self._login()
+        return int(r['uid'])
+
+    def _register(self):
+        data = {'userName': self.username, 'password': self.password, 'email': f'{self.username}@mail.ru'}
+        print(_send(self.gdps_id, GD.account_register, data))
     
     def get_user(self, id: int) -> User:
         data = {'targetAccountID': id}
 
-        # self._use_session(data)
+        self._use_session(data)
 
         s = _send(self.gdps_id, GD.get_user_info, data)
 
         return User(**s['user'])
 
     
-    def get_user_comments(self, id: int) -> list[Comment]:
-        data = {'accountID': id}
+    def get_user_comments(self, user: int | User) -> list[Comment]:
+        data = {'accountID': user if user is int else User.uid}
 
-        # self._use_session(data)
+        self._use_session(data)
 
-        comms = _send(self.gdps_id, GD.account_comment_get, data)['comments']
-
-        ret: list[Comment] = []
-        for comm in comms:
-            ret.append(Comment(**comm))
-        return ret
+        return [Comment(**comm) for comm in _send(self.gdps_id, GD.account_comment_get, data)['comments']]
 
     
     def get_level(self, id: int):
         data = {'levelID': id}
 
-        # self._use_session(data)
+        self._use_session(data)
 
         return _send(self.gdps_id, GD.level_download, data)
 
@@ -90,8 +92,6 @@ class GhostClient:
                    gauntlet: int | None = None,
                    followed: str | None = None,
                    demonFilter: int | None = None,
-                   accountID: int | None = None,
-                   gjp: str | None = None,
                    diff: int | None = None,
                    len: int | None = None,
                    song: int | None = None,
@@ -118,10 +118,6 @@ class GhostClient:
             d['followed'] = followed
         if demonFilter:
             d['demonFilter'] = demonFilter
-        if accountID:
-            d['accountID'] = accountID
-        if gjp:
-            d['gjp'] = gjp
         if diff:
             d['diff'] = diff
         if len:
@@ -146,46 +142,101 @@ class GhostClient:
         d['star'] = int(star)
         d['completedLevels'] = int(completedLevels)
 
-        # self._use_session(d)
+        self._use_session(d)
 
-        levels = _send(self.gdps_id, GD.get_levels, d)['levels']
-        ret: list[Level] = []
-        for lvl in levels:
-            ret.append(Level(**lvl))
-        return ret
+        return [Level(**l) for l in _send(self.gdps_id, GD.get_levels, d)['levels']]
 
 
     def get_leaderboard(self, type: TopType = TopType.top, count: int = 100) -> list[User]:
         data = {'type': type.value, 'count': count}
 
-        # self._use_session(data)
+        self._use_session(data)
 
-        leaderboard = _send(self.gdps_id, GD.get_scores, data)['leaderboard']
+        return [User(**u) for u in _send(self.gdps_id, GD.get_scores, data)['leaderboard']]
 
-        ret: list[User] = []
-        for l in leaderboard:
-            ret.append(User(**l))
-
-        return ret
-
-    def get_friend_requests(self, accountID: int = None, gjp2: str = None, getSent: bool = False, total: int = 10):
+    def get_friend_requests(self, getSent: bool = False, total: int = 10) -> list[FriendRequest]:
         data = {
-            'accountID': accountID,
-            'gjp2': gjp2,
-            'getSent': getSent,
+            'getSent': 1 if getSent else 0,
             'total': total
         }
-        # TODO
-        # self._use_session(data)
 
-        return _send(self.gdps_id, GD.friend_get_requests, data)
+        self._use_session(data)
 
-        pass
+        return [FriendRequest(**r) for r in _send(self.gdps_id, GD.friend_get_requests, data)['requests']]
 
-
-    def get_comment_history(self, userID: int, mode: int = 0, page: int = 0, total: int = 0) -> list[Comment]:
+    def read_friend_request(self, request: int | FriendRequest):
         data = {
-            'userID': userID,
+            'requestID': request if request is int else request.id
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.friend_read_request, data)
+
+    def accept_friend_request(self, request: int | FriendRequest):
+        data = {
+            'requestID': request if request is int else request.id
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.friend_accept_request, data)
+
+
+    def reject_friend_request(self, accounts: int | FriendRequest | list[int | FriendRequest]):
+        data = {
+            'targetAccountID': accounts if accounts is int else accounts.uid if accounts is FriendRequest else None
+        }
+        _accounts: str = ''
+        if accounts is list[int | FriendRequest]:
+            _accounts.join([_id if _id is int else _id.uid for _id in accounts])
+
+        data['accounts'] = _accounts
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.friend_accept_request, data)
+
+    def remove_friend(self, targetAccount: int | User):
+        data = {
+            'targetAccountID': targetAccount if targetAccount is int else targetAccount.uid
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.friend_remove, data)
+
+    def block_user(self, target: int | User):
+        data = {
+            'targetAccountID': target if target is int else target.uid
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.block_user, data)
+
+    def unblock_user(self, target: int | User):
+        data = {
+            'targetAccountID': target if target is int else target.uid
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.unblock_user, data)
+
+    def send_friend_request(self, toAccount: int | User, comment: str = ''):
+        data = {
+            'toAccountID': toAccount if toAccount is int else toAccount.uid,
+            'comment': base64(comment)
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.friend_request, data)
+
+    def get_comment_history(self, user: int | User, mode: int = 0, page: int = 0, total: int = 0) -> list[Comment]:
+        data = {
+            'userID': user if user is int else user.uid,
             'mode': mode,
             'page': page,
             'total': total
@@ -196,9 +247,9 @@ class GhostClient:
         return ret
 
 
-    def get_level_comments(self, levelID: int, page: int = 0, mode: int = 0, total: int = 10) -> list[Comment]:
+    def get_level_comments(self, level: int | Level, page: int = 0, mode: int = 0, total: int = 10) -> list[Comment]:
         data = {
-            'levelID': levelID,
+            'levelID': level if level is int else level.id,
             'page': page,
             'mode': mode,
             'total': total
@@ -209,10 +260,12 @@ class GhostClient:
         return ret
 
 
-    # def get_challenges(self):
-    #     data = {}
-    #
-    #     return _send(self.gdps_id, GD.get_challenges, data)
+    def get_challenges(self):
+        data: dict[str, Any] = {}
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.get_challenges, data)
 
     # if there was a way to get actual lvl id...
     def get_daily(self) -> int:
@@ -220,16 +273,22 @@ class GhostClient:
             'weekly': 0
         }
 
+        self._use_session(data)
+
         return _send(self.gdps_id, GD.get_challenges, data)['id']
 
     def get_creators(self) -> list[User]:
         return [User(**u) for u in _send(self.gdps_id, GD.get_creators, {})['leaderboards']]
 
-    def get_level_scores(self, accountID: int, gjp: str, levelID: int):
+    # я не знаю как выглядят левелскоры потому что их сука нету
+    def get_level_scores(self, level: int | Level, type: int = 1):
         data = {
-            'levelID': levelID,
-            'accountID': accountID,
-            'gjp': gjp
+            'levelID': level if level is int else level.id,
+            'type': type
         }
+
+        self._use_session(data)
+
+        print(data)
 
         return _send(self.gdps_id, GD.get_level_scores, data)
