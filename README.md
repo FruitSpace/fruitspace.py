@@ -26,8 +26,8 @@
 * ❌ message_delete
 * ❌ message_get
 * ❌ get_account
-* ❌ get_creators
-* ❌ level_get_daily
+* ✅ get_creators
+* ✅ level_get_daily (returns int)
 * ❌ get_gauntlets
 * ❌ get_level_scores
 * ❌ get_map_packs
