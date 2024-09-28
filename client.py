@@ -209,7 +209,27 @@ class GhostClient:
         return ret
 
 
-    def get_challenges(self):
-        data = {}
+    # def get_challenges(self):
+    #     data = {}
+    #
+    #     return _send(self.gdps_id, GD.get_challenges, data)
 
-        return _send(self.gdps_id, GD.get_challenges, data)
+    # if there was a way to get actual lvl id...
+    def get_daily(self) -> int:
+        data = {
+            'weekly': 0
+        }
+
+        return _send(self.gdps_id, GD.get_challenges, data)['id']
+
+    def get_creators(self) -> list[User]:
+        return [User(**u) for u in _send(self.gdps_id, GD.get_creators, {})['leaderboards']]
+
+    def get_level_scores(self, accountID: int, gjp: str, levelID: int):
+        data = {
+            'levelID': levelID,
+            'accountID': accountID,
+            'gjp': gjp
+        }
+
+        return _send(self.gdps_id, GD.get_level_scores, data)
