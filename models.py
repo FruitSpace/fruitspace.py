@@ -136,4 +136,14 @@ class Level:
 
 @dataclass
 class FriendRequest:
-    pass
+    clr_primary: str
+    clr_secondary: str
+    comment: str
+    date: datetime
+    iconId: int
+    iconType: int
+    id: int
+    isNew: int
+    special: str
+    uid: int
+    uname: str
