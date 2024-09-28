@@ -3,6 +3,7 @@ from enum import Enum
 
 class GD(Enum):
     account_login = "/db/accounts/loginGJAccount.php"
+    account_register = "/db/accounts/registerGJAccount.php"
     get_scores = "/db/getGJScores.php"
     get_levels = "/db/getGJLevels.php"
     level_download = "/db/downloadGJLevel.php"
@@ -10,11 +11,12 @@ class GD(Enum):
     get_user_info = "/db/getGJUserInfo20.php"
 
     friend_accept_request = "/db/acceptGJFriendRequest20.php"
-    friend_reject_request = "/db/deleteGJFriendRequests20.php"
     friend_get_requests = "/db/getGJFriendRequests20.php"
     friend_read_request = "/db/readGJFriendRequest20.php"
-    friend_remove = "/db/removeGJFriend20.php"
+    friend_reject_request = "/db/deleteGJFriendRequests20.php"
     friend_request = "/db/uploadFriendRequest20.php"
+    friend_remove = "/db/removeGJFriend20.php"
+    unblock_user = "/db/unblockGJUser20.php"
     block_user = "/db/blockGJUser20.php"
 
     get_challenges = "/db/getGJChallenges.php"
@@ -23,7 +25,6 @@ class GD(Enum):
 
     account_backup = "/db/accounts/backupGJAccount.php"
     account_management = "/db/accounts/accountManagement.php"
-    account_register = "/db/accounts/registerGJAccount.php"
     account_sync = "/db/accounts/syncGJAccount.php"
     account_backup_new = "/db/database/accounts/backupGJAccountNew.php"
     account_sync_new = "/db/accounts/syncGJAccount20.php"
@@ -51,7 +52,6 @@ class GD(Enum):
     level_report = "/db/reportGJLevel.php"
     request_mod = "/db/requestUserAccess.php"
     suggest_stars = "/db/suggestGJStars20.php"
-    unblock_user = "/db/unblockGJUser20.php"
     update_account_settings = "/db/updateGJAccSettings20.php"
     level_update_description = "/db/updateGJDesc20.php"
     update_user_score = "/db/updateGJUserScore.php"
