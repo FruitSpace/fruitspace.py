@@ -76,13 +76,13 @@ class User:
     uname: str
     role: Role
     is_banned: int
-    leaderboard_rank: int
     stats: Stats
     technical: Technical
     social: Social
     vessels: Vessels
     chests: Chests
     settings: Settings
+    leaderboard_rank: int = -1
 
 @dataclass
 class Comment:
@@ -147,3 +147,43 @@ class FriendRequest:
     special: str
     uid: int
     uname: str
+
+@dataclass
+class Song:
+    status: str
+    id: int
+    name: str
+    artist: str
+    size: float
+    url: str
+    is_banned: bool
+    downloads: int
+
+@dataclass
+class Message:
+    id: int
+    message: str
+    subject: str
+    uname: str
+    is_old: int = None
+    is_new: int = None
+    uid: int = None
+    uid_src: int = None
+    uid_dest: int = None
+    date: datetime = None
+    posted_time: datetime = None
+
+@dataclass
+class Gauntlet:
+    pack_name: str
+    levels: list[int]
+
+@dataclass
+class MapPack:
+    id: int
+    pack_name: str
+    levels: str
+    pack_stars: int
+    pack_coins: int
+    pack_difficulty: int
+    pack_color: str
