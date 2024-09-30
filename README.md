@@ -1,15 +1,34 @@
-* ✅ account_login
+* ❌ get_account (зачем)
 * ✅ get_scores
 * ✅ get_levels
-* ✅ level_download
 * ✅ account_comment_get
 * ✅ get_user_info
-* ❌ get_challenges
+* ✅ get_challenges
 * ✅ comment_get_history
 * ✅ comments_get
+* ✅ friend_get_requests
+* ✅ get_creators
+* ✅ level_get_daily (returns int)
+* ✅ get_level_scores (почему-то выдаёт -2. всегда. абсолютно.)
+* ✅ get_song_info
+* ✅ get_top_artists
+* ✅ get_user_list
+* ✅ get_users
+* ✅ message_get_all
+* ✅ message_get
+* ✅ get_gauntlets
+* ✅ get_map_packs
+* ✅ get_level_plat_scores (добавлено как доп. функциональность к get_level_scores)
+* ❌ get_rewards (а надо ли?)
+* ❌ get_content (не нужно)
+* ❌ get_music_library (надо ли?)
+* ❌ get_music_library_version (надо ли?)
+* ❌ get_song_info_mp3
+
+* ✅ account_login
+* ✅ level_download
 * ✅ friend_accept_request
 * ✅ friend_reject_request
-* ✅ friend_get_requests
 * ✅ friend_read_request
 * ✅ friend_remove
 * ✅ send_friend_request
@@ -24,19 +43,6 @@
 * ❌ comment_delete
 * ❌ level_delete
 * ❌ message_delete
-* ❌ message_get
-* ❌ get_account (зачем)
-* ✅ get_creators
-* ✅ level_get_daily (returns int)
-* ❌ get_gauntlets
-* ✅ get_level_scores (почему-то выдаёт -2. всегда. абсолютно.)
-* ❌ get_map_packs
-* ❌ message_get_all
-* ❌ get_rewards
-* ❌ get_song_info
-* ❌ get_top_artists
-* ❌ get_user_list
-* ❌ get_users
 * ❌ like_item
 * ❌ rate_demon
 * ❌ rate_star
@@ -54,9 +60,4 @@
 * ❌ level_list_delete
 * ❌ level_list_upload
 * ❌ level_list_search
-* ❌ get_level_plat_scores
-* ❌ get_content
 * ❌ relay_sfx
-* ❌ get_music_library
-* ❌ get_music_library_version
-* ❌ get_song_info_mp3

@@ -1,11 +1,11 @@
 import json
-from typing import Any
+from typing import Any, overload
 
 import requests
 
 import urls
 from enums import TopType
-from models import User, Comment, Level, FriendRequest
+from models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack
 from urls import GD
 from utils import gjp2, gjp, base64
 
@@ -53,7 +53,7 @@ class GhostClient:
     def _login(self) -> int:
         r = _send(self.gdps_id, GD.account_login, {'userName': self.username, 'password': self.password})
 
-        if 'code' in r and  r['code'] == '-1':
+        if 'code' in r and r['code'] == '-1':
             self._register()
             self._login()
         return int(r['uid'])
@@ -61,9 +61,16 @@ class GhostClient:
     def _register(self):
         data = {'userName': self.username, 'password': self.password, 'email': f'{self.username}@mail.ru'}
         print(_send(self.gdps_id, GD.account_register, data))
-    
-    def get_user(self, id: int) -> User:
-        data = {'targetAccountID': id}
+
+    def get_users(self, name: str) -> list[User]:
+        data = {
+            'str': name
+        }
+
+        return [User(**u) for u in _send(self.gdps_id, GD.get_users, data)['users']]
+
+    def get_user(self, _id: int) -> User:
+        data = {'targetAccountID': _id}
 
         self._use_session(data)
 
@@ -73,15 +80,15 @@ class GhostClient:
 
     
     def get_user_comments(self, user: int | User) -> list[Comment]:
-        data = {'accountID': user if user is int else User.uid}
+        data = {'accountID': user if isinstance(user, int) else User.uid}
 
         self._use_session(data)
 
         return [Comment(**comm) for comm in _send(self.gdps_id, GD.account_comment_get, data)['comments']]
 
     
-    def get_level(self, id: int):
-        data = {'levelID': id}
+    def get_level(self, _id: int):
+        data = {'levelID': _id}
 
         self._use_session(data)
 
@@ -93,13 +100,13 @@ class GhostClient:
                    followed: str | None = None,
                    demonFilter: int | None = None,
                    diff: int | None = None,
-                   len: int | None = None,
+                   _len: int | None = None,
                    song: int | None = None,
                    customSong: int | None = None,
                    page: int = 0,
                    count: int = 10,
-                   type: int = 0,
-                   str: str = "",
+                   _type: int = 0,
+                   _str: str = "",
                    uncomlpeted: int | bool = False,
                    onlyCompleted: int | bool = False,
                    featured: int | bool = False,
@@ -120,8 +127,8 @@ class GhostClient:
             d['demonFilter'] = demonFilter
         if diff:
             d['diff'] = diff
-        if len:
-            d['len'] = len
+        if _len:
+            d['len'] = _len
         if song:
             d['song'] = song
         if customSong:
@@ -129,8 +136,8 @@ class GhostClient:
 
         d['page'] = page
         d['count'] = count
-        d['type'] = type
-        d['str'] = str
+        d['type'] = _type
+        d['str'] = _str
         d['uncomlpeted'] = int(uncomlpeted)
         d['onlyCompleted'] = int(onlyCompleted)
         d['featured'] = int(featured)
@@ -147,8 +154,8 @@ class GhostClient:
         return [Level(**l) for l in _send(self.gdps_id, GD.get_levels, d)['levels']]
 
 
-    def get_leaderboard(self, type: TopType = TopType.top, count: int = 100) -> list[User]:
-        data = {'type': type.value, 'count': count}
+    def get_leaderboard(self, _type: TopType = TopType.top, count: int = 100) -> list[User]:
+        data = {'type': _type.value, 'count': count}
 
         self._use_session(data)
 
@@ -166,7 +173,7 @@ class GhostClient:
 
     def read_friend_request(self, request: int | FriendRequest):
         data = {
-            'requestID': request if request is int else request.id
+            'requestID': request if isinstance(request, int) else request.id
         }
 
         self._use_session(data)
@@ -175,7 +182,7 @@ class GhostClient:
 
     def accept_friend_request(self, request: int | FriendRequest):
         data = {
-            'requestID': request if request is int else request.id
+            'requestID': request if isinstance(request, int) else request.id
         }
 
         self._use_session(data)
@@ -183,13 +190,13 @@ class GhostClient:
         return _send(self.gdps_id, GD.friend_accept_request, data)
 
 
-    def reject_friend_request(self, accounts: int | FriendRequest | list[int | FriendRequest]):
+    def reject_friend_request(self, accounts: int | FriendRequest | list[int | User | FriendRequest]):
         data = {
-            'targetAccountID': accounts if accounts is int else accounts.uid if accounts is FriendRequest else None
+            'targetAccountID': accounts if isinstance(accounts, int) else accounts.uid if isinstance(accounts, FriendRequest) else None
         }
         _accounts: str = ''
-        if accounts is list[int | FriendRequest]:
-            _accounts.join([_id if _id is int else _id.uid for _id in accounts])
+        if isinstance(accounts, list):
+            _accounts.join([str(_id) if isinstance(_id, int) else _id.uid for _id in accounts])
 
         data['accounts'] = _accounts
 
@@ -199,7 +206,7 @@ class GhostClient:
 
     def remove_friend(self, targetAccount: int | User):
         data = {
-            'targetAccountID': targetAccount if targetAccount is int else targetAccount.uid
+            'targetAccountID': targetAccount if isinstance(targetAccount, int) else targetAccount.uid
         }
 
         self._use_session(data)
@@ -208,7 +215,7 @@ class GhostClient:
 
     def block_user(self, target: int | User):
         data = {
-            'targetAccountID': target if target is int else target.uid
+            'targetAccountID': target if isinstance(target, int) else target.uid
         }
 
         self._use_session(data)
@@ -217,7 +224,7 @@ class GhostClient:
 
     def unblock_user(self, target: int | User):
         data = {
-            'targetAccountID': target if target is int else target.uid
+            'targetAccountID': target if isinstance(target, int) else target.uid
         }
 
         self._use_session(data)
@@ -226,7 +233,7 @@ class GhostClient:
 
     def send_friend_request(self, toAccount: int | User, comment: str = ''):
         data = {
-            'toAccountID': toAccount if toAccount is int else toAccount.uid,
+            'toAccountID': toAccount if isinstance(toAccount, int) else toAccount.uid,
             'comment': base64(comment)
         }
 
@@ -236,7 +243,7 @@ class GhostClient:
 
     def get_comment_history(self, user: int | User, mode: int = 0, page: int = 0, total: int = 0) -> list[Comment]:
         data = {
-            'userID': user if user is int else user.uid,
+            'userID': user if isinstance(user, int) else user.uid,
             'mode': mode,
             'page': page,
             'total': total
@@ -249,7 +256,7 @@ class GhostClient:
 
     def get_level_comments(self, level: int | Level, page: int = 0, mode: int = 0, total: int = 10) -> list[Comment]:
         data = {
-            'levelID': level if level is int else level.id,
+            'levelID': level if isinstance(level, int) else level.id,
             'page': page,
             'mode': mode,
             'total': total
@@ -261,7 +268,10 @@ class GhostClient:
 
 
     def get_challenges(self):
-        data: dict[str, Any] = {}
+        data: dict[str, Any] = {
+            'udid': '228-1337-swag-trolling-trollface',
+            'chk': 'abcdE'
+        }
 
         self._use_session(data)
 
@@ -275,20 +285,87 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.get_challenges, data)['id']
+        return _send(self.gdps_id, GD.level_get_daily, data)['id']
 
-    def get_creators(self) -> list[User]:
-        return [User(**u) for u in _send(self.gdps_id, GD.get_creators, {})['leaderboards']]
-
-    # я не знаю как выглядят левелскоры потому что их сука нету
-    def get_level_scores(self, level: int | Level, type: int = 1):
+    def get_weekly(self) -> int:
         data = {
-            'levelID': level if level is int else level.id,
-            'type': type
+            'weekly': 1
         }
 
         self._use_session(data)
 
-        print(data)
+        return _send(self.gdps_id, GD.level_get_daily, data)['id']
 
-        return _send(self.gdps_id, GD.get_level_scores, data)
+    def get_creators(self) -> list[User]:
+        return [User(**u) for u in _send(self.gdps_id, GD.get_creators, {})['leaderboards']]
+
+    def get_user_list(self, _type: int = 0):
+        data = {
+            'type': _type
+        }
+
+        self._use_session(data)
+
+        return [User(**u) for u in _send(self.gdps_id, GD.get_user_list, data)['users']]
+
+    # я не знаю как выглядят левелскоры потому что их сука нету
+    def get_level_scores(self, level: int | Level, _type: int = 1, mode: int = 0, is_platformer: bool = False):
+        data = {
+            'levelID': level if level is int else level.id,
+            'type': _type,
+            'mode': mode
+        }
+        self._use_session(data)
+        if not is_platformer:
+            return _send(self.gdps_id, GD.get_level_scores, data)
+        else:
+            return _send(self.gdps_id, GD.get_level_plat_scores, data)
+
+
+
+    def get_song_info(self, songID: int) -> Song:
+        data = {
+            'songID': songID
+        }
+
+        return Song(**_send(self.gdps_id, GD.get_song_info, data)['music'])
+
+    def get_top_artists(self, page: int = 0) -> list[str]:
+        data = {
+            'page': page
+        }
+
+        return [artist for artist in _send(self.gdps_id, GD.get_top_artists, data)['artists'].values() if artist]
+
+    def get_messages(self, page: int = 0, getSent: bool = False):
+        data = {
+            'page': page,
+            'getSent': 1 if getSent else 0
+        }
+
+        self._use_session(data)
+
+        return [Message(**m) for m in _send(self.gdps_id, GD.message_get, data)['messages']]
+
+    def get_message(self, messageID: int):
+        data = {
+            'messageID': messageID
+        }
+
+        self._use_session(data)
+
+        return Message(**_send(self.gdps_id, GD.message_get, data)['content'])
+
+    def get_gauntlets(self, special: bool = True):
+        data = {
+            'special': 1 if special else 0
+        }
+
+        return [Gauntlet(**g) for g in _send(self.gdps_id, GD.get_gauntlets, data)['gauntlets']]
+
+    def get_map_packs(self, page: int = 0):
+        data = {
+            'page': page
+        }
+
+        return [MapPack(**p) for p in _send(self.gdps_id, GD.get_map_packs, data)['packs']]
