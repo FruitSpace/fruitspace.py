@@ -38,10 +38,10 @@
 * ✅ comment_delete
 * ✅ message_delete
 
-* ❌ level_delete
-* ❌ level_upload
-* ❌ level_update_description
-* ❌ level_report
+* ✅ level_delete
+* ✅ level_upload
+* ✅ level_update_description
+* ✅ level_report
 
 * ❌ account_comment_delete
 

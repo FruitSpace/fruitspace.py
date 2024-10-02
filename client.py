@@ -390,10 +390,54 @@ class GhostClient:
 
         return _send(self.gdps_id, GD.comment_delete, data)
 
-
     def upload_level(self, levelName: str, levelLength: LevelLength, objects: int, coins: int, levelString: str,
                     gameVersion: int = 22, levelID: int = 0, levelDesc: str = 'None', levelVersion: int = 1,
                     audioTrack: int = 0, songID: int = 0, twoPlayer: bool = 0, requestedStars: int = 0,
                     unlisted: int = 0, ldm: bool = False):
-        # TODO
-        pass
+        data = {
+            'levelName': levelName,
+            'levelLength': levelLength.value,
+            'objects': objects,
+            'coins': coins,
+            'levelString': levelString,
+            'gameVersion': gameVersion,
+            'levelID': levelID,
+            'levelDesc': levelDesc,
+            'levelVersion': levelVersion,
+            'audioTrack': audioTrack,
+            'songID': songID,
+            'twoPlayer': twoPlayer,
+            'requestedStars': requestedStars,
+            'unlisted': unlisted,
+            'ldm': 1 if ldm else 0
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.level_upload, data)
+
+    def delete_level(self, level: int | Level):
+        data = {
+            'levelID': level if isinstance(level, int) else level.id
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.level_delete, data)
+
+    def update_level_description(self, level: int | Level, plain_desc: str):
+        data = {
+            'levelID': level if isinstance(level, int) else level.id,
+            'levelDesc': base64(plain_desc)
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.level_update_description, data)
+
+    def report_level(self, level: int | Level):
+        data = {
+            'levelID': level if isinstance(level, int) else level.id
+        }
+
+        return _send(self.gdps_id, GD.level_report, data)
