@@ -19,12 +19,6 @@
 * ✅ get_gauntlets
 * ✅ get_map_packs
 * ✅ get_level_plat_scores (добавлено как доп. функциональность к get_level_scores)
-* ❌ get_rewards (а надо ли?)
-* ❌ get_content (не нужно)
-* ❌ get_music_library (надо ли?)
-* ❌ get_music_library_version (надо ли?)
-* ❌ get_song_info_mp3
-
 * ✅ account_login
 * ✅ level_download
 * ✅ friend_accept_request
@@ -33,31 +27,41 @@
 * ✅ friend_remove
 * ✅ send_friend_request
 * ✅ block_user
-* ❌ account_backup
-* ❌ account_management
 * ✅ account_register
-* ❌ account_sync
-* ❌ account_backup_new
-* ❌ account_sync_new
-* ❌ account_comment_delete
-* ❌ comment_delete
-* ❌ level_delete
-* ❌ message_delete
-* ❌ like_item
-* ❌ rate_demon
-* ❌ rate_star
-* ❌ level_report
-* ❌ request_mod
-* ❌ suggest_stars
 * ✅ unblock_user
-* ❌ update_account_settings
-* ❌ level_update_description
-* ❌ update_user_score
-* ❌ account_comment_upload
-* ❌ comment_upload
+* ❌ get_rewards (а надо ли?)
+* ❌ get_content (не нужно)
+* ❌ get_music_library (надо ли?)
+* ❌ get_music_library_version (надо ли?)
+* ❌ get_song_info_mp3 (?)
+ 
+* ✅ comment_delete
+* ✅ message_delete
+
+* ❌ level_delete
 * ❌ level_upload
-* ❌ message_upload
+* ❌ level_update_description
+* ❌ level_report
+
+* ❌ account_comment_delete
+
 * ❌ level_list_delete
 * ❌ level_list_upload
 * ❌ level_list_search
+
+* ❌ like_item
+* ❌ rate_demon
+* ❌ rate_star
+* ❌ request_mod
+* ❌ suggest_stars
+* ❌ update_account_settings
+* ❌ update_user_score
+* ❌ account_comment_upload
+* ❌ comment_upload
+* ❌ message_upload
 * ❌ relay_sfx
+* ❌ account_backup
+* ❌ account_management
+* ❌ account_sync
+* ❌ account_backup_new
+* ❌ account_sync_new

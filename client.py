@@ -4,7 +4,7 @@ from typing import Any, overload
 import requests
 
 import urls
-from enums import TopType
+from enums import TopType, LevelLength
 from models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack
 from urls import GD
 from utils import gjp2, gjp, base64
@@ -322,7 +322,6 @@ class GhostClient:
             return _send(self.gdps_id, GD.get_level_plat_scores, data)
 
 
-
     def get_song_info(self, songID: int) -> Song:
         data = {
             'songID': songID
@@ -369,3 +368,32 @@ class GhostClient:
         }
 
         return [MapPack(**p) for p in _send(self.gdps_id, GD.get_map_packs, data)['packs']]
+
+    def delete_message(self, message: int | Message, isSender: bool | None):
+        data = {
+            'messageID': message if isinstance(message, int) else message.id,
+            'isSender': 1 if isSender else 1 if isinstance(message, Message) and message.uid == self.user_id else 0
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.message_delete, data)
+
+    def delete_comment(self, comment: int | Comment, level: int | Level | None = None):
+        data = {
+            'commentID': comment if isinstance(comment, int) else comment.id,
+            'levelID': level if isinstance(level, int) else level.id if isinstance(level, Level) else comment.lvl_id \
+                if isinstance(comment, Comment) else -1
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.comment_delete, data)
+
+
+    def upload_level(self, levelName: str, levelLength: LevelLength, objects: int, coins: int, levelString: str,
+                    gameVersion: int = 22, levelID: int = 0, levelDesc: str = 'None', levelVersion: int = 1,
+                    audioTrack: int = 0, songID: int = 0, twoPlayer: bool = 0, requestedStars: int = 0,
+                    unlisted: int = 0, ldm: bool = False):
+        # TODO
+        pass
