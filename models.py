@@ -2,6 +2,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+# interface
+class Likeable:
+    id: int
+    type: int
 
 @dataclass
 class Role:
@@ -85,7 +89,7 @@ class User:
     leaderboard_rank: int = -1
 
 @dataclass
-class Comment:
+class Comment(Likeable):
     id: int
     uid: int
     likes: int
@@ -95,9 +99,15 @@ class Comment:
     percent: int
     is_spam: bool
 
+    def __post_init__(self):
+        if self.lvl_id:
+            self.type = 2
+        else:
+            self.type = 3
+
 
 @dataclass
-class Level:
+class Level(Likeable):
     id: int
     name: str
     description: str
@@ -133,6 +143,7 @@ class Level:
     is_ldm: int
     upload_date: str
     update_date: str
+    type = 1
 
 @dataclass
 class FriendRequest:
@@ -187,3 +198,8 @@ class MapPack:
     pack_coins: int
     pack_difficulty: int
     pack_color: str
+
+@dataclass
+class LevelList(Likeable):
+    id: int
+    levels: list[Level]
