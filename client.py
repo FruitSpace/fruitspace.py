@@ -1,11 +1,12 @@
 import json
-from typing import Any, overload
+from typing import Any
+from functools import singledispatch
 
 import requests
 
 import urls
-from enums import TopType, LevelLength
-from models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack
+from enums import TopType, LevelLength, LevelDifficulty, SearchDifficulty
+from models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack, Likeable, LevelList
 from urls import GD
 from utils import gjp2, gjp, base64
 
@@ -79,13 +80,32 @@ class GhostClient:
         return User(**s['user'])
 
     
-    def get_user_comments(self, user: int | User) -> list[Comment]:
+    def get_user_posts(self, user: int | User) -> list[Comment]:
         data = {'accountID': user if isinstance(user, int) else User.uid}
 
         self._use_session(data)
 
         return [Comment(**comm) for comm in _send(self.gdps_id, GD.account_comment_get, data)['comments']]
 
+    def post(self, plain_text: str):
+        data = {
+            'comment': base64(plain_text),
+            'cType': 1
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.account_comment_upload, data)
+
+    def delete_post(self, comment: int | Comment):
+        data = {
+            'commentID': comment if isinstance(comment, int) else comment.id,
+            'cType': 1
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.account_comment_delete, data)
     
     def get_level(self, _id: int):
         data = {'levelID': _id}
@@ -98,8 +118,7 @@ class GhostClient:
     def get_levels(self,
                    gauntlet: int | None = None,
                    followed: str | None = None,
-                   demonFilter: int | None = None,
-                   diff: int | None = None,
+                   diff: SearchDifficulty = SearchDifficulty.NONE,
                    _len: int | None = None,
                    song: int | None = None,
                    customSong: int | None = None,
@@ -123,10 +142,10 @@ class GhostClient:
             d['gauntlet'] = gauntlet
         if followed:
             d['followed'] = followed
-        if demonFilter:
-            d['demonFilter'] = demonFilter
-        if diff:
-            d['diff'] = diff
+
+        d['demonFilter'] = diff.value[0]
+        d['diff'] = diff.value[1]
+
         if _len:
             d['len'] = _len
         if song:
@@ -441,3 +460,91 @@ class GhostClient:
         }
 
         return _send(self.gdps_id, GD.level_report, data)
+
+    @singledispatch
+    def like_item(self, item: Likeable):
+        data = {
+            'itemID': item.id,
+            'type': item.type,
+            'like': 1
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.like_item, data)
+
+    @like_item.register
+    def like_item(self, itemID: int, item_type: int):
+        data = {
+            'itemID': itemID,
+            'type': item_type,
+            'like': 1
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.like_item, data)
+
+    @singledispatch
+    def dislike_item(self, item: Likeable):
+        data = {
+            'itemID': item.id,
+            'type': item.type,
+            'like': 0
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.like_item, data)
+
+    @dislike_item.register
+    def dislike_item(self, itemID: int, item_type: int):
+        data = {
+            'itemID': itemID,
+            'type': item_type,
+            'like': 0
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.like_item, data)
+
+    def upload_level_list(self, listName: str, listDesc: str, difficulty: LevelDifficulty, levels: list[Level] | LevelList, listID: int = 0, unlisted: int = 0):
+        data = {
+            'listName': listName,
+            'listDesc': listDesc,
+            'difficulty': difficulty.value,
+            'listLevels': ','.join([str(lvl.id) for lvl in levels]) if isinstance(levels, list) else levels.levels,
+            'listID': levels.id if not listID and isinstance(levels, LevelList) else 0,
+            'unlisted': unlisted
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.level_list_upload, data)
+
+    def get_level_lists(self, type: int = 2, _str: str = '',
+                        page: int = 0, diff: SearchDifficulty = SearchDifficulty.NONE,
+                        rated: bool = False, followed: str | list[User] = '') -> list[LevelList]:
+        data = {
+            'type': type,
+            'page': page,
+            'str': _str,
+            'diff': diff.value[1],
+            'demonFilter': diff.value[0],
+            'star': 1 if rated else 0,
+            'followed': followed if isinstance(followed, str) else ','.join([str(u.uid) for u in followed])
+        }
+
+        self._use_session(data)
+
+        return [LevelList(**l) for l in _send(self.gdps_id, GD.level_list_search, data)['lists']]
+
+    def delele_level_list(self, list: int | LevelList):
+        data = {
+            'listID': list if isinstance(list, int) else list.id
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.level_list_delete, data)

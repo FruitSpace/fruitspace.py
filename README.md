@@ -43,20 +43,20 @@
 * ✅ level_update_description
 * ✅ level_report
 
-* ❌ account_comment_delete
+* ✅ account_comment_delete
+* ✅ account_comment_upload
 
-* ❌ level_list_delete
-* ❌ level_list_upload
-* ❌ level_list_search
+* ✅ level_list_delete
+* ✅ level_list_upload
+* ✅ level_list_search
 
-* ❌ like_item
+* ✅ like_item
 * ❌ rate_demon
 * ❌ rate_star
 * ❌ request_mod
 * ❌ suggest_stars
 * ❌ update_account_settings
 * ❌ update_user_score
-* ❌ account_comment_upload
 * ❌ comment_upload
 * ❌ message_upload
 * ❌ relay_sfx
