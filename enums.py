@@ -60,3 +60,11 @@ class LevelListSearchFilter(Enum):
     FOLLOWED = 12
     FRIENDS = 13
     SENT = 27
+
+class DemonDifficulty(Enum):
+    EASY = 1
+    MEDIUM = 2
+    HARD = 3
+    INSANE = 4
+    EXTREME = 5
+    DEFAULT = 3
