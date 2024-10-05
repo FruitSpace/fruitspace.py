@@ -5,8 +5,9 @@ from functools import singledispatch
 import requests
 
 import urls
-from enums import TopType, LevelLength, LevelDifficulty, SearchDifficulty
-from models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack, Likeable, LevelList
+from enums import TopType, LevelLength, LevelDifficulty, SearchDifficulty, DemonDifficulty
+from models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack, Likeable, LevelList, Settings, \
+    Vessels
 from urls import GD
 from utils import gjp2, gjp, base64
 
@@ -63,6 +64,61 @@ class GhostClient:
         data = {'userName': self.username, 'password': self.password, 'email': f'{self.username}@mail.ru'}
         print(_send(self.gdps_id, GD.account_register, data))
 
+    def update_account_settings(self, settings: Settings):
+        data = {
+            'mS': settings.allow_messages,
+            'frS': settings.allow_friend_requests,
+            'cS': settings.allow_view_comments,
+            'yt': settings.youtube,
+            'twitter': settings.twitter,
+            'twitch': settings.twitch
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.update_account_settings, data)
+
+    def update_user_score(self, moons: int = 0,
+                          demons: int = 0,
+                          diamonds: int = 0,
+                          vessels: Vessels = Vessels(),
+                          dinfo: str | list[int] | list[Level] = '',
+                          dinfow: int = 0,
+                          dinfog: int = 0,
+                          sinfo: str = 0,
+                          sinfod: int = 0,
+                          sinfog: int = 0):
+        data = {
+            'moons': moons,
+            'demons': demons,
+            'diamonds': diamonds,
+            'dinfo': dinfo if isinstance(dinfo, str) else ','.join([str(lvl) if isinstance(lvl, int) else str(lvl.id) for lvl in dinfo]),
+            'dinfow': dinfow,
+            'dinfog': dinfog,
+            'sinfo': sinfo,
+            'sinfod': sinfod,
+            'sinfog': sinfog,
+            'accIcon': vessels.shown_icon,
+            'accShip': vessels.ship,
+            'accBall': vessels.ball,
+            'accBird': vessels.ufo,
+            'accDart': vessels.wave,
+            'accRobot': vessels.robot,
+            'accGlow': vessels.color_glow,
+            'accSpider': vessels.spider,
+            'accExplosion': vessels.death,
+            'accSwing': vessels.swing,
+            'accJetpack': vessels.jetpack,
+            'color1': vessels.color_primary,
+            'color2': vessels.color_secondary,
+            'color3': vessels.color_glow,
+            'special': vessels.color_glow
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.update_user_score, data)
+
     def get_users(self, name: str) -> list[User]:
         data = {
             'str': name
@@ -86,6 +142,17 @@ class GhostClient:
         self._use_session(data)
 
         return [Comment(**comm) for comm in _send(self.gdps_id, GD.account_comment_get, data)['comments']]
+
+    def comment(self, level: int | Level, comment: str, username: str | None = None):
+        data = {
+            'levelID': level if isinstance(level, int) else level.id,
+            'comment': base64(comment),
+            'userName': self.username if username is None else username
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.comment_upload, data)
 
     def post(self, plain_text: str):
         data = {
@@ -374,6 +441,18 @@ class GhostClient:
 
         return Message(**_send(self.gdps_id, GD.message_get, data)['content'])
 
+    def send_message(self, account: int | User, subject: str, body: str):
+        data = {
+            'targetAccountID': account if isinstance(account, int) else account.uid,
+            'subject': base64(subject),
+            'body': base64(body)
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.message_upload, data)
+
+
     def get_gauntlets(self, special: bool = True):
         data = {
             'special': 1 if special else 0
@@ -548,3 +627,44 @@ class GhostClient:
         self._use_session(data)
 
         return _send(self.gdps_id, GD.level_list_delete, data)
+
+    def request_mod(self):
+        data = {}
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.request_mod, data)
+
+    def rate_demon(self, level: int | Level, diff: int | DemonDifficulty):
+        data = {
+            'levelID': level if isinstance(level, int) else level.id,
+            'rating': diff if isinstance(diff, int) else diff.value
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.rate_demon, data)
+
+    def rate_star(self, level: int | Level, diff: int | LevelDifficulty):
+        data = {
+            'levelID': level if isinstance(level, int) else level.id,
+            'stars': diff if isinstance(diff, int) else diff.value
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.rate_star, data)
+
+    def suggest_star(self, level: int | Level, diff: int | LevelDifficulty, feature: int = 0):
+        """
+        @param feature: 0 for star rate, 1 for feature, 2 for epic, 3 for legendary and 4 for mythic
+        """
+        data = {
+            'levelID': level if isinstance(level, int) else level.id,
+            'stars': diff if isinstance(diff, int) else diff.value,
+            'feature': feature
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.rate_star, data)

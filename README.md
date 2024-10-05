@@ -51,15 +51,21 @@
 * ✅ level_list_search
 
 * ✅ like_item
-* ❌ rate_demon
-* ❌ rate_star
-* ❌ request_mod
-* ❌ suggest_stars
-* ❌ update_account_settings
-* ❌ update_user_score
-* ❌ comment_upload
-* ❌ message_upload
+
+* ✅ rate_demon
+* ✅ rate_star
+* ✅ suggest_stars
+  
+* ✅ request_mod
+
+* ✅ comment_upload
+* ✅ message_upload
+
+* ✅ update_account_settings
+* ✅ update_user_score
+
 * ❌ relay_sfx
+
 * ❌ account_backup
 * ❌ account_management
 * ❌ account_sync
