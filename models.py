@@ -41,22 +41,22 @@ class Social:
 
 @dataclass
 class Vessels:
-    shown_icon: int
-    icon_type: int
-    color_primary: int
-    color_secondary: int
-    color_glow: int
-    cube: int
-    ship: int
-    ball: int
-    ufo: int
-    wave: int
-    robot: int
-    spider: int
-    swing: int
-    jetpack: int
-    trace: int
-    death: int
+    shown_icon: int = 0
+    icon_type: int = 0
+    color_primary: int = 0
+    color_secondary: int = 0
+    color_glow: int = 0
+    cube: int = 0
+    ship: int = 0
+    ball: int = 0
+    ufo: int = 0
+    wave: int = 0
+    robot: int = 0
+    spider: int = 0
+    swing: int = 0
+    jetpack: int = 0
+    trace: int = 0
+    death: int = 0
 
 @dataclass
 class Chests:
