@@ -1,4 +1,3 @@
-* ❌ get_account (зачем)
 * ✅ get_scores
 * ✅ get_levels
 * ✅ account_comment_get
@@ -30,7 +29,6 @@
 * ✅ account_register
 * ✅ unblock_user
 * ❌ get_rewards (а надо ли?)
-* ❌ get_content (не нужно)
 * ❌ get_music_library (надо ли?)
 * ❌ get_music_library_version (надо ли?)
 * ❌ get_song_info_mp3 (?)
@@ -66,8 +64,8 @@
 
 * ❌ relay_sfx
 
-* ❌ account_backup
-* ❌ account_management
-* ❌ account_sync
-* ❌ account_backup_new
-* ❌ account_sync_new
+* ❌ account_management (я думаю не надо)
+* ✅ account_backup
+* ✅ account_sync
+* ✅ account_backup_new
+* ✅ account_sync_new

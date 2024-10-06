@@ -53,16 +53,56 @@ class GhostClient:
 
     
     def _login(self) -> int:
-        r = _send(self.gdps_id, GD.account_login, {'userName': self.username, 'password': self.password})
+        r = _send(self.gdps_id, GD.account_login, {'userName': self.username, 'password': self.password, 'udid': 'aaaaaaaaa'})
 
         if 'code' in r and r['code'] == '-1':
             self._register()
-            self._login()
+            return self._login()
         return int(r['uid'])
 
     def _register(self):
         data = {'userName': self.username, 'password': self.password, 'email': f'{self.username}@mail.ru'}
-        print(_send(self.gdps_id, GD.account_register, data))
+        return _send(self.gdps_id, GD.account_register, data)
+
+    def sync_account_new(self):
+        data = {
+            'password': self.password,
+            'userName': self.username
+        }
+
+        self._use_session(data)
+        return _send(self.gdps_id, GD.account_sync_new, data)
+
+    def sync_account(self):
+        data = {
+            'password': self.password,
+            'userName': self.username
+        }
+
+        self._use_session(data)
+        return _send(self.gdps_id, GD.account_sync, data)
+
+    def backup_account_new(self, saveData: str):
+        data = {
+            'saveData': saveData,
+            'password': self.password,
+            'userName': self.username
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.account_backup_new, data)
+
+    def backup_account(self, saveData: str):
+        data = {
+            'saveData': saveData,
+            'password': self.password,
+            'userName': self.username
+        }
+
+        self._use_session(data)
+
+        return _send(self.gdps_id, GD.account_backup, data)
 
     def update_account_settings(self, settings: Settings):
         data = {
