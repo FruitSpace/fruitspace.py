@@ -8,7 +8,7 @@ import urls
 from enums import TopType, LevelLength, LevelDifficulty, SearchDifficulty, DemonDifficulty
 from models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack, Likeable, LevelList, Settings, \
     Vessels
-from urls import GD
+from urls import URL
 from utils import gjp2, gjp, base64
 
 _base_url: str = 'https://rugd.gofruit.space/{gdps}' # %s is GDPS index
@@ -24,14 +24,13 @@ def __send(gdps_id: str, url: str, data: dict, use_json: bool = True) -> str | d
         return json.loads(r)
     return r
 
-def _send(gdps_id: str, url: urls.GD | str, data: dict, use_json: bool = True) -> str | dict:
-    return __send(gdps_id, url.value if type(url)==GD else url, data, use_json)
+def _send(gdps_id: str, url: urls.URL | str, data: dict, use_json: bool = True) -> str | dict:
+    return __send(gdps_id, url.value if type(url) == URL else url, data, use_json)
 
 class GhostClient:
     username: str = None
     password: str = None
     user_id: int = None
-
 
     def __init__(self, gdps_id: str, username: str = None, password: str = None):
         self.gdps_id = gdps_id
@@ -53,7 +52,7 @@ class GhostClient:
 
     
     def _login(self) -> int:
-        r = _send(self.gdps_id, GD.account_login, {'userName': self.username, 'password': self.password, 'udid': 'aaaaaaaaa'})
+        r = _send(self.gdps_id, URL.account_login, {'userName': self.username, 'password': self.password, 'udid': 'aaaaaaaaa'})
 
         if 'code' in r and r['code'] == '-1':
             self._register()
@@ -62,7 +61,7 @@ class GhostClient:
 
     def _register(self):
         data = {'userName': self.username, 'password': self.password, 'email': f'{self.username}@mail.ru'}
-        return _send(self.gdps_id, GD.account_register, data)
+        return _send(self.gdps_id, URL.account_register, data)
 
     def sync_account_new(self):
         data = {
@@ -71,7 +70,7 @@ class GhostClient:
         }
 
         self._use_session(data)
-        return _send(self.gdps_id, GD.account_sync_new, data)
+        return _send(self.gdps_id, URL.account_sync_new, data)
 
     def sync_account(self):
         data = {
@@ -80,7 +79,7 @@ class GhostClient:
         }
 
         self._use_session(data)
-        return _send(self.gdps_id, GD.account_sync, data)
+        return _send(self.gdps_id, URL.account_sync, data)
 
     def backup_account_new(self, saveData: str):
         data = {
@@ -91,7 +90,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.account_backup_new, data)
+        return _send(self.gdps_id, URL.account_backup_new, data)
 
     def backup_account(self, saveData: str):
         data = {
@@ -102,7 +101,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.account_backup, data)
+        return _send(self.gdps_id, URL.account_backup, data)
 
     def update_account_settings(self, settings: Settings):
         data = {
@@ -116,7 +115,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.update_account_settings, data)
+        return _send(self.gdps_id, URL.update_account_settings, data)
 
     def update_user_score(self, moons: int = 0,
                           demons: int = 0,
@@ -157,21 +156,21 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.update_user_score, data)
+        return _send(self.gdps_id, URL.update_user_score, data)
 
     def get_users(self, name: str) -> list[User]:
         data = {
             'str': name
         }
 
-        return [User(**u) for u in _send(self.gdps_id, GD.get_users, data)['users']]
+        return [User(**u) for u in _send(self.gdps_id, URL.get_users, data)['users']]
 
     def get_user(self, _id: int) -> User:
         data = {'targetAccountID': _id}
 
         self._use_session(data)
 
-        s = _send(self.gdps_id, GD.get_user_info, data)
+        s = _send(self.gdps_id, URL.get_user_info, data)
 
         return User(**s['user'])
 
@@ -181,7 +180,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return [Comment(**comm) for comm in _send(self.gdps_id, GD.account_comment_get, data)['comments']]
+        return [Comment(**comm) for comm in _send(self.gdps_id, URL.account_comment_get, data)['comments']]
 
     def comment(self, level: int | Level, comment: str, username: str | None = None):
         data = {
@@ -192,7 +191,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.comment_upload, data)
+        return _send(self.gdps_id, URL.comment_upload, data)
 
     def post(self, plain_text: str):
         data = {
@@ -202,7 +201,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.account_comment_upload, data)
+        return _send(self.gdps_id, URL.account_comment_upload, data)
 
     def delete_post(self, comment: int | Comment):
         data = {
@@ -212,14 +211,14 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.account_comment_delete, data)
+        return _send(self.gdps_id, URL.account_comment_delete, data)
     
     def get_level(self, _id: int):
         data = {'levelID': _id}
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.level_download, data)
+        return _send(self.gdps_id, URL.level_download, data)
 
     
     def get_levels(self,
@@ -277,7 +276,7 @@ class GhostClient:
 
         self._use_session(d)
 
-        return [Level(**l) for l in _send(self.gdps_id, GD.get_levels, d)['levels']]
+        return [Level(**l) for l in _send(self.gdps_id, URL.get_levels, d)['levels']]
 
 
     def get_leaderboard(self, _type: TopType = TopType.top, count: int = 100) -> list[User]:
@@ -285,7 +284,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return [User(**u) for u in _send(self.gdps_id, GD.get_scores, data)['leaderboard']]
+        return [User(**u) for u in _send(self.gdps_id, URL.get_scores, data)['leaderboard']]
 
     def get_friend_requests(self, getSent: bool = False, total: int = 10) -> list[FriendRequest]:
         data = {
@@ -295,7 +294,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return [FriendRequest(**r) for r in _send(self.gdps_id, GD.friend_get_requests, data)['requests']]
+        return [FriendRequest(**r) for r in _send(self.gdps_id, URL.friend_get_requests, data)['requests']]
 
     def read_friend_request(self, request: int | FriendRequest):
         data = {
@@ -304,7 +303,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.friend_read_request, data)
+        return _send(self.gdps_id, URL.friend_read_request, data)
 
     def accept_friend_request(self, request: int | FriendRequest):
         data = {
@@ -313,7 +312,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.friend_accept_request, data)
+        return _send(self.gdps_id, URL.friend_accept_request, data)
 
 
     def reject_friend_request(self, accounts: int | FriendRequest | list[int | User | FriendRequest]):
@@ -328,7 +327,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.friend_accept_request, data)
+        return _send(self.gdps_id, URL.friend_accept_request, data)
 
     def remove_friend(self, targetAccount: int | User):
         data = {
@@ -337,7 +336,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.friend_remove, data)
+        return _send(self.gdps_id, URL.friend_remove, data)
 
     def block_user(self, target: int | User):
         data = {
@@ -346,7 +345,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.block_user, data)
+        return _send(self.gdps_id, URL.block_user, data)
 
     def unblock_user(self, target: int | User):
         data = {
@@ -355,7 +354,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.unblock_user, data)
+        return _send(self.gdps_id, URL.unblock_user, data)
 
     def send_friend_request(self, toAccount: int | User, comment: str = ''):
         data = {
@@ -365,7 +364,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.friend_request, data)
+        return _send(self.gdps_id, URL.friend_request, data)
 
     def get_comment_history(self, user: int | User, mode: int = 0, page: int = 0, total: int = 0) -> list[Comment]:
         data = {
@@ -375,7 +374,7 @@ class GhostClient:
             'total': total
         }
 
-        ret = [Comment(**comm) for comm in _send(self.gdps_id, GD.comment_get_history, data)['comments']]
+        ret = [Comment(**comm) for comm in _send(self.gdps_id, URL.comment_get_history, data)['comments']]
 
         return ret
 
@@ -388,7 +387,7 @@ class GhostClient:
             'total': total
         }
 
-        ret = [Comment(**comm) for comm in _send(self.gdps_id, GD.comments_get, data)['comments']]
+        ret = [Comment(**comm) for comm in _send(self.gdps_id, URL.comments_get, data)['comments']]
 
         return ret
 
@@ -401,7 +400,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.get_challenges, data)
+        return _send(self.gdps_id, URL.get_challenges, data)
 
     # if there was a way to get actual lvl id...
     def get_daily(self) -> int:
@@ -411,7 +410,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.level_get_daily, data)['id']
+        return _send(self.gdps_id, URL.level_get_daily, data)['id']
 
     def get_weekly(self) -> int:
         data = {
@@ -420,10 +419,10 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.level_get_daily, data)['id']
+        return _send(self.gdps_id, URL.level_get_daily, data)['id']
 
     def get_creators(self) -> list[User]:
-        return [User(**u) for u in _send(self.gdps_id, GD.get_creators, {})['leaderboards']]
+        return [User(**u) for u in _send(self.gdps_id, URL.get_creators, {})['leaderboards']]
 
     def get_user_list(self, _type: int = 0):
         data = {
@@ -432,7 +431,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return [User(**u) for u in _send(self.gdps_id, GD.get_user_list, data)['users']]
+        return [User(**u) for u in _send(self.gdps_id, URL.get_user_list, data)['users']]
 
     # я не знаю как выглядят левелскоры потому что их сука нету
     def get_level_scores(self, level: int | Level, _type: int = 1, mode: int = 0, is_platformer: bool = False):
@@ -443,9 +442,9 @@ class GhostClient:
         }
         self._use_session(data)
         if not is_platformer:
-            return _send(self.gdps_id, GD.get_level_scores, data)
+            return _send(self.gdps_id, URL.get_level_scores, data)
         else:
-            return _send(self.gdps_id, GD.get_level_plat_scores, data)
+            return _send(self.gdps_id, URL.get_level_plat_scores, data)
 
 
     def get_song_info(self, songID: int) -> Song:
@@ -453,14 +452,14 @@ class GhostClient:
             'songID': songID
         }
 
-        return Song(**_send(self.gdps_id, GD.get_song_info, data)['music'])
+        return Song(**_send(self.gdps_id, URL.get_song_info, data)['music'])
 
     def get_top_artists(self, page: int = 0) -> list[str]:
         data = {
             'page': page
         }
 
-        return [artist for artist in _send(self.gdps_id, GD.get_top_artists, data)['artists'].values() if artist]
+        return [artist for artist in _send(self.gdps_id, URL.get_top_artists, data)['artists'].values() if artist]
 
     def get_messages(self, page: int = 0, getSent: bool = False):
         data = {
@@ -470,7 +469,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return [Message(**m) for m in _send(self.gdps_id, GD.message_get, data)['messages']]
+        return [Message(**m) for m in _send(self.gdps_id, URL.message_get, data)['messages']]
 
     def get_message(self, messageID: int):
         data = {
@@ -479,7 +478,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return Message(**_send(self.gdps_id, GD.message_get, data)['content'])
+        return Message(**_send(self.gdps_id, URL.message_get, data)['content'])
 
     def send_message(self, account: int | User, subject: str, body: str):
         data = {
@@ -490,7 +489,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.message_upload, data)
+        return _send(self.gdps_id, URL.message_upload, data)
 
 
     def get_gauntlets(self, special: bool = True):
@@ -498,14 +497,14 @@ class GhostClient:
             'special': 1 if special else 0
         }
 
-        return [Gauntlet(**g) for g in _send(self.gdps_id, GD.get_gauntlets, data)['gauntlets']]
+        return [Gauntlet(**g) for g in _send(self.gdps_id, URL.get_gauntlets, data)['gauntlets']]
 
     def get_map_packs(self, page: int = 0):
         data = {
             'page': page
         }
 
-        return [MapPack(**p) for p in _send(self.gdps_id, GD.get_map_packs, data)['packs']]
+        return [MapPack(**p) for p in _send(self.gdps_id, URL.get_map_packs, data)['packs']]
 
     def delete_message(self, message: int | Message, isSender: bool | None):
         data = {
@@ -515,7 +514,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.message_delete, data)
+        return _send(self.gdps_id, URL.message_delete, data)
 
     def delete_comment(self, comment: int | Comment, level: int | Level | None = None):
         data = {
@@ -526,7 +525,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.comment_delete, data)
+        return _send(self.gdps_id, URL.comment_delete, data)
 
     def upload_level(self, levelName: str, levelLength: LevelLength, objects: int, coins: int, levelString: str,
                     gameVersion: int = 22, levelID: int = 0, levelDesc: str = 'None', levelVersion: int = 1,
@@ -552,7 +551,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.level_upload, data)
+        return _send(self.gdps_id, URL.level_upload, data)
 
     def delete_level(self, level: int | Level):
         data = {
@@ -561,7 +560,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.level_delete, data)
+        return _send(self.gdps_id, URL.level_delete, data)
 
     def update_level_description(self, level: int | Level, plain_desc: str):
         data = {
@@ -571,14 +570,14 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.level_update_description, data)
+        return _send(self.gdps_id, URL.level_update_description, data)
 
     def report_level(self, level: int | Level):
         data = {
             'levelID': level if isinstance(level, int) else level.id
         }
 
-        return _send(self.gdps_id, GD.level_report, data)
+        return _send(self.gdps_id, URL.level_report, data)
 
     @singledispatch
     def like_item(self, item: Likeable):
@@ -590,7 +589,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.like_item, data)
+        return _send(self.gdps_id, URL.like_item, data)
 
     @like_item.register
     def like_item(self, itemID: int, item_type: int):
@@ -602,7 +601,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.like_item, data)
+        return _send(self.gdps_id, URL.like_item, data)
 
     @singledispatch
     def dislike_item(self, item: Likeable):
@@ -614,7 +613,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.like_item, data)
+        return _send(self.gdps_id, URL.like_item, data)
 
     @dislike_item.register
     def dislike_item(self, itemID: int, item_type: int):
@@ -626,7 +625,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.like_item, data)
+        return _send(self.gdps_id, URL.like_item, data)
 
     def upload_level_list(self, listName: str, listDesc: str, difficulty: LevelDifficulty, levels: list[Level] | LevelList, listID: int = 0, unlisted: int = 0):
         data = {
@@ -640,7 +639,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.level_list_upload, data)
+        return _send(self.gdps_id, URL.level_list_upload, data)
 
     def get_level_lists(self, type: int = 2, _str: str = '',
                         page: int = 0, diff: SearchDifficulty = SearchDifficulty.NONE,
@@ -657,7 +656,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return [LevelList(**l) for l in _send(self.gdps_id, GD.level_list_search, data)['lists']]
+        return [LevelList(**l) for l in _send(self.gdps_id, URL.level_list_search, data)['lists']]
 
     def delele_level_list(self, list: int | LevelList):
         data = {
@@ -666,14 +665,14 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.level_list_delete, data)
+        return _send(self.gdps_id, URL.level_list_delete, data)
 
     def request_mod(self):
         data = {}
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.request_mod, data)
+        return _send(self.gdps_id, URL.request_mod, data)
 
     def rate_demon(self, level: int | Level, diff: int | DemonDifficulty):
         data = {
@@ -683,7 +682,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.rate_demon, data)
+        return _send(self.gdps_id, URL.rate_demon, data)
 
     def rate_star(self, level: int | Level, diff: int | LevelDifficulty):
         data = {
@@ -693,7 +692,7 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.rate_star, data)
+        return _send(self.gdps_id, URL.rate_star, data)
 
     def suggest_star(self, level: int | Level, diff: int | LevelDifficulty, feature: int = 0):
         """
@@ -707,4 +706,4 @@ class GhostClient:
 
         self._use_session(data)
 
-        return _send(self.gdps_id, GD.rate_star, data)
+        return _send(self.gdps_id, URL.rate_star, data)

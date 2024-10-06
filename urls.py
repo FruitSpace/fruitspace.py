@@ -1,7 +1,6 @@
 from enum import Enum
 
-
-class GD(Enum):
+class URL(Enum):
     account_login = "/db/accounts/loginGJAccount.php"
     account_register = "/db/accounts/registerGJAccount.php"
     get_scores = "/db/getGJScores.php"
@@ -33,7 +32,6 @@ class GD(Enum):
     level_delete = "/db/deleteGJLevelUser20.php"
     message_delete = "/db/deleteGJMessages20.php"
     message_get = "/db/downloadGJMessage20.php"
-    # account_sync_new = "/db/database/accounts/syncGJAccountNew.php"
     get_creators = "/db/getGJCreators.php"
     level_get_daily = "/db/getGJDailyLevel.php"
     get_gauntlets = "/db/getGJGauntlets.php"

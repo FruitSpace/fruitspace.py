@@ -28,10 +28,6 @@
 * ✅ block_user
 * ✅ account_register
 * ✅ unblock_user
-* ❌ get_rewards (а надо ли?)
-* ❌ get_music_library (надо ли?)
-* ❌ get_music_library_version (надо ли?)
-* ❌ get_song_info_mp3 (?)
  
 * ✅ comment_delete
 * ✅ message_delete
@@ -62,10 +58,14 @@
 * ✅ update_account_settings
 * ✅ update_user_score
 
-* ❌ relay_sfx
 
-* ❌ account_management (я думаю не надо)
 * ✅ account_backup
 * ✅ account_sync
 * ✅ account_backup_new
 * ✅ account_sync_new
+
+* ❌ relay_sfx (?)
+* ❌ get_rewards (а надо ли?)
+* ❌ get_music_library (надо ли?)
+* ❌ get_music_library_version (надо ли?)
+* ❌ get_song_info_mp3 (?)
