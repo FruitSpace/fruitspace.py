@@ -9,4 +9,5 @@ setup(
     packages=['fruitspace'],
     install_requires=['requests','setuptools'],
     package_dir={'': 'src'},
+    long_description=''
 )
