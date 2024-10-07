@@ -4,11 +4,11 @@ from functools import singledispatch
 
 import requests
 
-from src.fruitspace.enums import TopType, LevelLength, LevelDifficulty, SearchDifficulty, DemonDifficulty
-from src.fruitspace.models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack, Likeable, LevelList, Settings, \
+from fruitspace.enums import TopType, LevelLength, LevelDifficulty, SearchDifficulty, DemonDifficulty
+from fruitspace.models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack, Likeable, LevelList, Settings, \
     Vessels
-from src.fruitspace.urls import URL
-from src.fruitspace.utils import gjp2, gjp, base64
+from fruitspace.urls import URL
+from fruitspace.utils import gjp2, gjp, base64
 
 _base_url: str = 'https://rugd.gofruit.space/{gdps}' # %s is GDPS index
 
