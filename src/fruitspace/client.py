@@ -4,12 +4,11 @@ from functools import singledispatch
 
 import requests
 
-import urls
-from enums import TopType, LevelLength, LevelDifficulty, SearchDifficulty, DemonDifficulty
-from models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack, Likeable, LevelList, Settings, \
+from src.fruitspace.enums import TopType, LevelLength, LevelDifficulty, SearchDifficulty, DemonDifficulty
+from src.fruitspace.models import User, Comment, Level, FriendRequest, Song, Message, Gauntlet, MapPack, Likeable, LevelList, Settings, \
     Vessels
-from urls import URL
-from utils import gjp2, gjp, base64
+from src.fruitspace.urls import URL
+from src.fruitspace.utils import gjp2, gjp, base64
 
 _base_url: str = 'https://rugd.gofruit.space/{gdps}' # %s is GDPS index
 
@@ -24,7 +23,7 @@ def __send(gdps_id: str, url: str, data: dict, use_json: bool = True) -> str | d
         return json.loads(r)
     return r
 
-def _send(gdps_id: str, url: urls.URL | str, data: dict, use_json: bool = True) -> str | dict:
+def _send(gdps_id: str, url: URL | str, data: dict, use_json: bool = True) -> str | dict:
     return __send(gdps_id, url.value if type(url) == URL else url, data, use_json)
 
 class GhostClient:
