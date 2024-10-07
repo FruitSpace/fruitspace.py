@@ -6,7 +6,7 @@ setup(
     description='SDK for working with FruitSpace\'s databases',
     author='whoisamyy',
     author_email='egegegg002@gmail.com',
-    packages=[''],
+    packages=['fruitspace'],
     install_requires=['requests','setuptools'],
     package_dir={'': 'src'},
 )
