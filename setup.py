@@ -9,5 +9,6 @@ setup(
     packages=['fruitspace'],
     install_requires=['requests','setuptools'],
     package_dir={'': 'src'},
-    long_description=''
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown'
 )
